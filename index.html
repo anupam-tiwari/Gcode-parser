@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <!-- Importing Bootstrap CSS/Styling library-->
+</head>
+    <body>
+        <div class="content">
+          <div class="dnd">☝️ Drop a gcode file here to view it</div>
+          <div class="left">
+            <div id="editor-panel">
+              <div id="editor"></div>
+            </div>
+            <div id="control-panel">
+              <div class="controls">
+                <label title="Increase this to increase the step size, current step size is 1, that means it will take one step at a time">Steps</label>&nbsp;<input
+                  type="range"
+                  min="1"
+                  value="0"
+                  id="step"
+                />
+              </div>
+              
+                <button type="button" class="btn btn-primary" id="load_button" onclick="Load()">Load</button>
+                <div id="success-text"><h6 ></h6></div>
+                
+            </div>
+            
+          </div>
+          <div class="right">
+            <canvas id="renderer" class="gcode-previewer"></canvas>
+          </div>
+          <div class="buttons">
+            <button id='move_back' class="control-button">⏪Fast Reversed</button>
+            <button id='step_backward' class="control-button">◀️step backward</button>
+            <button id='step_forward' class="control-button">▶️step forward</button>
+            <button id="move_fast"  class="control-button">⏩fast forward</button>
+          </div>
+        </div>
+        <script src="three.min.js"></script>
+        <script src="OrbitControls.js"></script>
+        <script src="dist/gcode-preview.js"></script>
+        <script src="dist/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="demo.js"></script>
+        <script>
+            const gcodeDemo = initDemo();   
+        </script>
+    </body>
+</html>
