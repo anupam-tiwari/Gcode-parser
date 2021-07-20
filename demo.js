@@ -15,9 +15,11 @@ var lines;
 var current_line = 1; 
 var steps = 1;
 
-function Load() {
+function Update() {
     var gcode = editor.getValue();
-    lines = gcode.split("\n"); 
+    //lines = gcode.split("\n");
+    console.log(gcode); 
+    //console.log(sizeof(lines)); 
     step.max = lines.length;
     //_handleGCode('xyz',lines);
     $("#success-text").fadeIn(); 
@@ -26,7 +28,18 @@ function Load() {
     $(function() {
       setTimeout(function() { $("#success-text").fadeOut(1500); }, 5000)
       
-      })
+  })
+}
+
+function Download(){
+  download("hello.gcode", lines.toString());
+}
+
+function Load(){
+  var gcode = editor.getValue();
+  lines = gcode.split('\n');
+  console.log(lines); 
+  cleanGcode(lines);
 }
 
 function initDemo(){
@@ -131,6 +144,39 @@ function initDemo(){
     console.log(preview);
     return preview;
     
+}
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+function cleanGcode(rawGcode){
+  var gcodeLength = rawGcode.length; 
+  console.log(gcodeLength);
+  let gcodeClean = []; 
+  let counter = 0; 
+  for(let i = 0; i<rawGcode.length; i++){
+    if(rawGcode[i][0] == ';'){
+    }
+    else{
+      counter++; 
+      gcodeClean[counter] = rawGcode[i];
+       
+    }
+   }
+   var toeditor = gcodeClean.toString();
+   lines  = gcodeClean;
+   console.log(lines);
+   editor.setValue(toeditor);
 }
 
 function updateUI(){
