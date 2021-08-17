@@ -1,7 +1,4 @@
-var total = 0; count = 1;
-while(count<=10){
-    total += count; 
-    count += 1; 
-}
+let state = true; 
 
-console . log ( total ) ;
+
+for

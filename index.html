@@ -23,10 +23,24 @@
                   value="0"
                   id="step"
                 />
+                <div class="controls">
+                  <label>Z paramenter</label>&nbsp;<input
+                    type="range"
+                    min="1"
+                    value="0"
+                    id="end-layer"
+                  />
+                </div>
               </div>
-              <button type="button" class="btn btn-primary" id="load_button" onclick="Load()">Load</button>
-              <button type="button" class="btn btn-primary" id="load_button" onclick="Update()">Update</button>
-              <button type="button" class="btn btn-primary" id="load_button" onclick="Download()">Download</button>
+              <div><input type="checkbox" id="download_original" name="scales">
+                <label for="download_original">Download With Headers</label>
+              </div>
+              
+              <div><button type="button" class="btn btn-primary" id="load_button" onclick="Load()">Load</button>
+                <button type="button" class="btn btn-primary" id="load_button" onclick="Update()">Update</button>
+                <button type="button" class="btn btn-primary" id="load_button" onclick="Download()">Download</button>
+              </div>
+              
               <div id="success-text"><h6 ></h6></div>
                 
             </div>
@@ -38,6 +52,7 @@
           <div class="buttons">
             <button id='move_back' class="control-button">⏪Fast Reversed</button>
             <button id='step_backward' class="control-button">◀️step backward</button>
+            <button id='pause-resume' class="control-button">⏸pause/play</button>
             <button id='step_forward' class="control-button">▶️step forward</button>
             <button id="move_fast"  class="control-button">⏩fast forward</button>
           </div>

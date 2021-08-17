@@ -1,26 +1,38 @@
 let gcodePreview; 
 
 var editor = ace.edit("editor");
-const endLayer = document.getElementById('endlayer');
+const endLayer = document.getElementById('end-layer');
 //const reverse = document.getElementById('reverse');
 const move_fast = document.getElementById('move_fast');
 const move_back = document.getElementById('move_back');
 const step_forward = document.getElementById('step_forward');
 const step_backward = document.getElementById('step_backward');
+const pause_play = document.getElementById('pause-resume');
 const step = document.getElementById('step');
 const control_text = document.getElementById('success-text');
+const check_box = document.getElementById('download_original');
 
 var gcode_array; 
 var lines;
 var current_line = 1; 
 var steps = 1;
+var original_gcode
+let state = true;
+var max_size; 
+var editor_state =1; 
+let stringvar = ""; 
+let header;
+var layercount; 
 
 function Update() {
     var gcode = editor.getValue();
+    
+
     //lines = gcode.split("\n");
     console.log(gcode); 
     //console.log(sizeof(lines)); 
     step.max = lines.length;
+    //endLayer.max = preview.layers.length;
     //_handleGCode('xyz',lines);
     $("#success-text").fadeIn(); 
     control_text.innerHTML = "Updated"; 
@@ -32,13 +44,18 @@ function Update() {
 }
 
 function Download(){
-  download("hello.gcode", lines.toString());
+  
+  if (check_box.checked == true){
+    download("hello.gcode", header);
+  } else {
+    download("hello.gcode", stringvar);
+  }
 }
 
 function Load(){
   var gcode = editor.getValue();
+  header = gcode
   lines = gcode.split('\n');
-  console.log(lines); 
   cleanGcode(lines);
 }
 
@@ -49,9 +66,11 @@ function initDemo(){
     
     const preview = (window.preview = new GCodePreview.WebGLPreview({
         canvas: document.querySelector('.gcode-previewer'),
-        topLayerColor: new THREE.Color(`hsl(180, 50%, 50%)`).getHex(),
-        lastSegmentColor: new THREE.Color(`hsl(270, 50%, 50%)`).getHex(),
-        // lineWidth: 4
+        topLayerColor: new THREE.Color(`hsl(270, 50%, 50%)`).getHex(),
+        //lastSegmentColor: new THREE.Color(`hsl(180, 50%, 50%)`).getHex(),
+        //lineWidth: 4,
+        extrusionColor: new THREE.Color(`hsl(0, 100%, 50%)`).getHex() , 
+        //lastSegmentColor: "#F2BFC1", 
         buildVolume: {x: 150, y: 150, z: 150},
         initialCameraPosition: [0,400,450],
         // debug: true
@@ -59,6 +78,7 @@ function initDemo(){
 
       preview.renderExtrusion = true;
       preview.renderTravel = false;
+      //preview.extrusionColor =  new THREE.Color(`hsl(0, 100%, 50%)`).getHex() ;
 
       preview.buildVolume= { 
         x: 150,
@@ -76,6 +96,14 @@ function initDemo(){
         steps = step_inc;
         console.log(step_inc);
         
+      });
+
+      endLayer.addEventListener('input', function(evt) {
+        console.log("this"); 
+        preview.endLayer = +endLayer.value;
+        console.log(endLayer.value);
+        //startLayer.value = preview.startLayer = Math.min(preview.startLayer, preview.endLayer);
+        preview.render();
       });
 
      
@@ -118,8 +146,28 @@ function initDemo(){
         populate_editor(file);   
     });
 
+    pause_play.addEventListener('click', function(evt){
+      if(state == true){
+        state = false; 
+        console.log(state); 
+        
+      }
+      else{
+        state  = true; 
+        console.log(state); 
+        //preview.extrusionColor =  "#F2BFC1";
+        startLoadingProgressive(lines);
+      }
+    });
+
+
+    
+
     move_fast.addEventListener('click', function(evt){
-      startLoadingProgressive(lines);
+      
+        startLoadingProgressive(lines);
+      
+      
     }); 
 
     step_forward.addEventListener('click', function(evt){
@@ -130,17 +178,13 @@ function initDemo(){
       current_line = current_line - steps;
       editor.gotoLine(current_line);
       var backward = lines.slice(0,current_line);
-      //console.log(current_line);
-      // gcodePreview.clear();
       gcodePreview.processGCode(backward);
       gcodePreview.clear();
       console.log(backward[current_line-1]);
-      //console.log(lines.slice(0,current_line)); 
-    //_handleGCode(lines);
     }); 
 
     gcodePreview = preview;
-    //endLayer.setAttribute('max', gcodePreview.layers.length);
+    endLayer.max = 1000;
     console.log(preview);
     return preview;
     
@@ -160,28 +204,30 @@ function download(filename, text) {
 }
 
 function cleanGcode(rawGcode){
-  var gcodeLength = rawGcode.length; 
-  console.log(gcodeLength);
   let gcodeClean = []; 
-  let counter = 0; 
+  let counter = 0;
   for(let i = 0; i<rawGcode.length; i++){
     if(rawGcode[i][0] == ';'){
     }
     else{
       counter++; 
+      rawGcode[i]  = rawGcode[i].replace(/(\r\n|\n|\r)/gm, "");
       gcodeClean[counter] = rawGcode[i];
-       
     }
    }
-   var toeditor = gcodeClean.toString();
-   lines  = gcodeClean;
-   console.log(lines);
-   editor.setValue(toeditor);
+  gcodeClean = gcodeClean.map(i =>i + " E0.001\r ");
+   for(let j = 0;  j<gcodeClean.length ; j++){
+    stringvar =  stringvar + gcodeClean[j];
+   }
+   lines = gcodeClean;
+   editor.setValue(stringvar);
 }
 
 function updateUI(){
       step.setAttribute('max', gcodePreview.layers.length);
       step.value = gcodePreview.layers.length;
+      endLayer.setAttribute('max', gcodePreview.layers.length);
+  endLayer.value = gcodePreview.layers.length;
 }
 
 function forward(){
@@ -205,11 +251,18 @@ function populate_editor(file){
   var toeditor = lines.toString();
   //console.log(toeditor);
   step.max = lines.length;
+  endLayer.max = lines.length;
+  max_size = lines.length; 
   editor.session.setValue(toeditor);
   }; 
   reader.readAsText(file);
   console.log(reader.result);
   
+}
+
+function ObjectToEditor(objectGcode){
+  var stringGcode = objectGcode.toString();
+  return stringGcode;
 }
 
 function loadGCode(file) {
@@ -240,12 +293,22 @@ function _handleGCode(filename, gcode) {
       const start = c * chunkSize;
       const end = (c + 1) * chunkSize;
       const chunk = lines.slice(start, end);
-      editor.gotoLine(end);
+      editor.gotoLine(end+editor_state);
       console.log("chunk",chunk);
       //editor.gotoLine(c);
       console.log('chunk',chunk);
+      // if(lines[c]){
+      //   console.log("wow"); 
+      // }
       
       c++;
+      if(state == false){
+        console.log(c);
+        console.log(steps);
+        editor_state = c; 
+        lines = lines.slice(c,max_size); 
+        throw "paused";
+      }
       if (c < chunks) {
         window.__loadTimer__ = requestAnimationFrame(loadProgressive)
       }
@@ -259,7 +322,7 @@ function _handleGCode(filename, gcode) {
   
     lines = gcode;
    
-    gcodePreview.clear();
+    //gcodePreview.clear();
     if (window.__loadTimer__) clearTimeout(window.__loadTimer__);
     loadProgressive();
   }
