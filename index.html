@@ -10,12 +10,13 @@
 </head>
     <body>
         <div class="content">
-          <div class="dnd">☝️ Drop a gcode file here to view it</div>
+          <!-- <div class="dnd">☝️ Drop a gcode file here to view it</div> -->
           <div class="left">
             <div id="editor-panel">
               <div id="editor"></div>
             </div>
             <div id="control-panel">
+              
               <div class="controls">
                 <label title="Increase this to increase the step size, current step size is 1, that means it will take one step at a time">Steps</label>&nbsp;<input
                   type="range"
@@ -23,6 +24,7 @@
                   value="0"
                   id="step"
                 />
+                <h5 id="step-indicator" title="Indicates the Instructions per render">1 Gcode Instructions/render</h5>
                 <div class="controls">
                   <label>Z paramenter</label>&nbsp;<input
                     type="range"
@@ -36,9 +38,45 @@
                 <label for="download_original">Download With Headers</label>
               </div>
               
-              <div><button type="button" class="btn btn-primary" id="load_button" onclick="Load()">Load</button>
+              <div>
+                <button type="button" class="btn btn-primary" title="Click to remove comments from the pasted Gcodes" id="load_button" onclick="Clean()">Clean</button>
                 <button type="button" class="btn btn-primary" id="load_button" onclick="Update()">Update</button>
-                <button type="button" class="btn btn-primary" id="load_button" onclick="Download()">Download</button>
+                <button type="button" class="btn btn-primary" id="load_button" onclick="DownloadGcode()">Download</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">How to Guide!</button>
+              </div>
+
+              <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                  <div class="modal-header">
+                    <h3>How to Guide!</h3>
+                  </div>
+                    <div class="modal-body">
+                      <h5>Functionality</h5>
+                      <p><a href="#" role="button" class="btn btn-primary" title="Load the G-code from the editor" data-content="Popover body content is set in this attribute.">Clean</a> Loads and removes the comments from the G-code.</p>
+                      <p><a href="#" role="button" class="btn btn-primary" title="Update G-code" data-content="Popover body content is set in this attribute.">Update</a> Loads and refects the the changes on the render</p>
+                      <p><a href="#" role="button" class="btn btn-primary" title="Download G-code" data-content="Popover body content is set in this attribute.">Download</a> Downloads the modified G-code file with or without comments.</p>
+                      <p><a href="#" role="button" class="control-button" title="Reverse rendering " data-content="Popover body content is set in this attribute.">⏪Fast Reversed</a>Reverse render the loaded G-code file.</p>
+                      <p><a href="#" role="button" class="control-button" title="Step rendering" data-content="Popover body content is set in this attribute.">◀️step backward</a> Reverse render one instruction cycle per time.</p>
+                      <p><a href="#" role="button" class="control-button" title="Step forward rendering" data-content="Popover body content is set in this attribute.">▶️step forward</a> Forward render one instruction cycle per time.</p>
+                      <p><a href="#" role="button" class="control-button" title="Fast rendering" data-content="Popover body content is set in this attribute.">⏩fast forward</a> Fast forward render.</p>
+                      <hr>
+                      <h5>Instructions on rendering</h5>
+                      <p>1. Paste Gcode in the editor</p>
+                      <p>2. Press on clean(removes comments from the G-code) or load(directly loads) to load it on the program</p>
+                      <p>3. Press ⏩fast forward or ▶️step forward to run the renderer</p>
+                      <div></div>
+<hr>
+                      <p></p>
+                      <p>Built using <a href="https://github.com/remcoder/gcode-preview"> Github </a>Gcode-preview package</p>
+                      <p>Contact: <a href="atiwari4@bwh.harvard.edu">atiwari4@bwh.harvard.edu</a></p>
+                   </div>
+
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div id="success-text"><h6 ></h6></div>
@@ -63,7 +101,11 @@
         <script src="dist/ace.js" type="text/javascript" charset="utf-8"></script>
         <script src="demo.js"></script>
         <script>
-            const gcodeDemo = initDemo();   
+            const gcodeDemo = initDemo(); 
+            
+        loadGCodeFromServer('veritas.gcode');
+    
+
         </script>
     </body>
 </html>
